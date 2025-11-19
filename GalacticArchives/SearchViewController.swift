@@ -213,14 +213,26 @@ class SearchViewController: UIViewController {
 extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return isSearching ? 1 : 2
+        // Section 0: Surprise Me
+        // Section 1: Take the Quiz
+        // Section 2: Recent Searches (if any)
+        return isSearching ? 1 : 3
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isSearching {
             return searchResults.count
         } else {
-            return section == 0 ? 1 : recentSearches.count
+            switch section {
+            case 0:
+                return 1 // Surprise Me
+            case 1:
+                return 1 // Take the Quiz
+            case 2:
+                return recentSearches.count
+            default:
+                return 0
+            }
         }
     }
     
@@ -240,7 +252,16 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
         } else if indexPath.section == 0 {
             // Surprise Me cell
             let cell = UITableViewCell(style: .default, reuseIdentifier: "SurpriseCell")
-            cell.textLabel?.text = "🎲 Surprise Me!"
+            cell.textLabel?.text = "Surprise Me!"
+            cell.textLabel?.font = .systemFont(ofSize: 18, weight: .medium)
+            cell.accessoryType = .disclosureIndicator
+            cell.selectionStyle = .none
+            return cell
+            
+        } else if indexPath.section == 1 {
+            // Take the Quiz cell
+            let cell = UITableViewCell(style: .default, reuseIdentifier: "QuizCell")
+            cell.textLabel?.text = "Which character are you?"
             cell.textLabel?.font = .systemFont(ofSize: 18, weight: .medium)
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .none
@@ -279,6 +300,10 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
         } else if indexPath.section == 0 {
             // Surprise Me!
             fetchRandomItem()
+        } else if indexPath.section == 1 {
+            // Take the Quiz
+            let quizVC = QuizViewController()
+            navigationController?.pushViewController(quizVC, animated: true)
             
         } else {
             // Recent search
