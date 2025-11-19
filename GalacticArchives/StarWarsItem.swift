@@ -64,6 +64,8 @@ struct StarWarsItem: Codable, Identifiable, Equatable {
     let skinColors: String?
     let averageLifespan: String?
     let language: String?
+    let speciesHairColors: String?
+    let speciesEyeColors: String?
 
     // Vehicle / starship specific
     let model: String?
@@ -115,8 +117,8 @@ struct StarWarsItem: Codable, Identifiable, Equatable {
             if let designation = designation, !designation.isEmpty { info["Designation"] = designation }
             if let averageHeight = averageHeight, !averageHeight.isEmpty { info["Average Height"] = "\(averageHeight) cm" }
             if let skinColors = skinColors, !skinColors.isEmpty { info["Skin Colors"] = skinColors }
-            if let hairColors = hairColor, !hairColors.isEmpty { info["Hair Colors"] = hairColors }
-            if let eyeColors = eyeColor, !eyeColors.isEmpty { info["Eye Colors"] = eyeColors }
+            if let hairColors = speciesHairColors, !hairColors.isEmpty { info["Hair Colors"] = hairColors }
+            if let eyeColors = speciesEyeColors, !eyeColors.isEmpty { info["Eye Colors"] = eyeColors }
             if let averageLifespan = averageLifespan, !averageLifespan.isEmpty { info["Average Lifespan"] = averageLifespan }
             if let language = language, !language.isEmpty { info["Language"] = language }
 
@@ -190,6 +192,8 @@ struct StarWarsItem: Codable, Identifiable, Equatable {
         case averageHeight = "average_height"
         case skinColors = "skin_colors"
         case averageLifespan = "average_lifespan"
+        case speciesHairColors = "hair_colors"
+        case speciesEyeColors = "eye_colors"
         case model, manufacturer, length
         case costInCredits = "cost_in_credits"
         case maxAtmospheringSpeed = "max_atmosphering_speed"

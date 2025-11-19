@@ -12,6 +12,12 @@ class DetailViewController: UIViewController {
         return scrollView
     }()
     
+    private let starfieldView: StarfieldView = {
+        let view = StarfieldView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private let contentView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -22,7 +28,7 @@ class DetailViewController: UIViewController {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.backgroundColor = .systemGray5
+        imageView.backgroundColor = UIColor(white: 0.1, alpha: 1.0)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -31,7 +37,7 @@ class DetailViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 28, weight: .bold)
         label.numberOfLines = 0
-        label.textColor = .label
+        label.textColor = .systemYellow
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -40,7 +46,7 @@ class DetailViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .regular)
         label.numberOfLines = 0
-        label.textColor = .secondaryLabel
+        label.textColor = .systemGray3
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -91,8 +97,9 @@ class DetailViewController: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
         
+        view.addSubview(starfieldView)
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         
@@ -103,6 +110,11 @@ class DetailViewController: UIViewController {
         contentView.addSubview(shareButton)
         
         NSLayoutConstraint.activate([
+            starfieldView.topAnchor.constraint(equalTo: view.topAnchor),
+            starfieldView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            starfieldView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            starfieldView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -179,8 +191,17 @@ class DetailViewController: UIViewController {
         for (key, value) in item.additionalInfo {
             addInfoSection(title: key, content: value)
         }
-
-        loadHomeworldIfNeeded()
+        print("DEBUG film fields:",
+            "title=\(item.title ?? "nil")",
+            "episodeId=\(String(describing: item.episodeId))",
+            "releaseDate=\(String(describing: item.releaseDate))")
+        print("DEBUG people fields:",
+            "name=\(item.name ?? "nil")",
+            "hair=\(String(describing: item.hairColor))",
+            "skin=\(String(describing: item.skinColor))",
+            "eye=\(String(describing: item.eyeColor))",
+            "birthYear=\(String(describing: item.birthYear))")
+                loadHomeworldIfNeeded()
     }
 
     private func loadHomeworldIfNeeded() {
@@ -202,7 +223,11 @@ class DetailViewController: UIViewController {
             let config = UIImage.SymbolConfiguration(pointSize: 80, weight: .light)
             self?.headerImageView.image = UIImage(systemName: self?.item.type.iconName ?? "questionmark", withConfiguration: config)
             self?.headerImageView.contentMode = .scaleAspectFit
-            self?.headerImageView.tintColor = .systemGray3
+            if let itemType = self?.item.type {
+                self?.headerImageView.tintColor = Theme.accentColor(for: itemType)
+            } else {
+                self?.headerImageView.tintColor = .systemYellow
+            }
         }
     }
     
@@ -210,12 +235,12 @@ class DetailViewController: UIViewController {
         let titleLabel = UILabel()
         titleLabel.text = title.uppercased()
         titleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
-        titleLabel.textColor = .systemYellow
+        titleLabel.textColor = Theme.accentColor(for: item.type)
         
         let contentLabel = UILabel()
         contentLabel.text = content
         contentLabel.font = .systemFont(ofSize: 16, weight: .regular)
-        contentLabel.textColor = .label
+        contentLabel.textColor = .white
         contentLabel.numberOfLines = 0
         
         let stackView = UIStackView(arrangedSubviews: [titleLabel, contentLabel])

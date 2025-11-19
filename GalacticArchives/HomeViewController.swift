@@ -4,6 +4,12 @@ class HomeViewController: UIViewController {
     
     private let categories = ItemType.allCases
     
+    private let starfieldView: StarfieldView = {
+        let view = StarfieldView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 16
@@ -11,7 +17,7 @@ class HomeViewController: UIViewController {
         layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .systemBackground
+        collectionView.backgroundColor = .black
         collectionView.register(CategoryCell.self, forCellWithReuseIdentifier: CategoryCell.reuseIdentifier)
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -26,10 +32,16 @@ class HomeViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
+        view.addSubview(starfieldView)
         view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
+            starfieldView.topAnchor.constraint(equalTo: view.topAnchor),
+            starfieldView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            starfieldView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            starfieldView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -43,8 +55,10 @@ class HomeViewController: UIViewController {
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .systemBackground
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
+        appearance.backgroundColor = .black
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: UIColor.systemYellow
+        ]
         
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
@@ -99,7 +113,7 @@ class CategoryCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textAlignment = .center
-        label.textColor = .label
+        label.textColor = .systemYellow
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -114,8 +128,12 @@ class CategoryCell: UICollectionViewCell {
     }
     
     private func setupCell() {
-        backgroundColor = .secondarySystemBackground
+        backgroundColor = UIColor(white: 0.12, alpha: 1.0)
         layer.cornerRadius = 12
+        layer.shadowColor = UIColor.systemYellow.cgColor
+        layer.shadowOpacity = 0.4
+        layer.shadowRadius = 8
+        layer.shadowOffset = CGSize(width: 0, height: 4)
         
         contentView.addSubview(iconImageView)
         contentView.addSubview(titleLabel)
@@ -135,5 +153,9 @@ class CategoryCell: UICollectionViewCell {
     func configure(with category: ItemType) {
         titleLabel.text = category.displayName
         iconImageView.image = UIImage(systemName: category.iconName)
+        let accent = Theme.accentColor(for: category)
+        iconImageView.tintColor = accent
+        layer.borderColor = accent.cgColor
+        layer.borderWidth = 1
     }
 }

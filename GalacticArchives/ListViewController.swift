@@ -8,12 +8,18 @@ class ListViewController: UIViewController {
     private var currentPage = 1
     private var hasMoreData = true
     
+    private let starfieldView: StarfieldView = {
+        let view = StarfieldView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(ItemCell.self, forCellReuseIdentifier: ItemCell.reuseIdentifier)
         tableView.rowHeight = 80
         tableView.separatorStyle = .none
-        tableView.backgroundColor = .systemBackground
+        tableView.backgroundColor = .black
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
@@ -48,11 +54,17 @@ class ListViewController: UIViewController {
     
     private func setupUI() {
         title = category.displayName
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
         
+        view.addSubview(starfieldView)
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
+            starfieldView.topAnchor.constraint(equalTo: view.topAnchor),
+            starfieldView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            starfieldView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            starfieldView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -140,7 +152,9 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
             return UITableViewCell()
         }
         
-        let item = isSearching ? filteredItems[indexPath.row] : items[indexPath.row]
+        let dataSource = isSearching ? filteredItems : items
+        guard indexPath.row < dataSource.count else { return UITableViewCell() }
+        let item = dataSource[indexPath.row]
         cell.configure(with: item)
         return cell
     }
@@ -148,7 +162,9 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let item = isSearching ? filteredItems[indexPath.row] : items[indexPath.row]
+        let dataSource = isSearching ? filteredItems : items
+        guard indexPath.row < dataSource.count else { return }
+        let item = dataSource[indexPath.row]
         let detailVC = DetailViewController(item: item)
         navigationController?.pushViewController(detailVC, animated: true)
     }
@@ -191,7 +207,7 @@ class ItemCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 8
-        imageView.backgroundColor = .systemGray5
+        imageView.backgroundColor = UIColor(white: 0.15, alpha: 1.0)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -199,7 +215,7 @@ class ItemCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .semibold)
-        label.textColor = .label
+        label.textColor = .white
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -208,7 +224,7 @@ class ItemCell: UITableViewCell {
     private let subtitleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .secondaryLabel
+        label.textColor = .systemGray3
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -216,7 +232,7 @@ class ItemCell: UITableViewCell {
     
     private let chevronImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "chevron.right"))
-        imageView.tintColor = .systemGray3
+        imageView.tintColor = .systemYellow
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -257,6 +273,14 @@ class ItemCell: UITableViewCell {
             chevronImageView.widthAnchor.constraint(equalToConstant: 12),
             chevronImageView.heightAnchor.constraint(equalToConstant: 20)
         ])
+        backgroundColor = .clear
+        contentView.backgroundColor = UIColor(white: 0.08, alpha: 0.95)
+        contentView.layer.cornerRadius = 12
+        contentView.layer.masksToBounds = true
+        layer.shadowColor = UIColor.systemYellow.cgColor
+        layer.shadowOpacity = 0.25
+        layer.shadowRadius = 6
+        layer.shadowOffset = CGSize(width: 0, height: 3)
     }
     
     func configure(with item: StarWarsItem) {
@@ -266,6 +290,10 @@ class ItemCell: UITableViewCell {
         // Set placeholder image based on item type
         let placeholderImage = UIImage(systemName: item.type.iconName)
         itemImageView.image = placeholderImage
+        let accent = Theme.accentColor(for: item.type)
+        itemImageView.tintColor = accent
+        contentView.layer.borderColor = accent.withAlphaComponent(0.6).cgColor
+        contentView.layer.borderWidth = 1
         
         // Load actual image if available
         if let imageUrl = item.imageUrl, let url = URL(string: imageUrl) {

@@ -9,12 +9,18 @@ class FavoritesViewController: UIViewController {
         }
     }
     
+    private let starfieldView: StarfieldView = {
+        let view = StarfieldView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(ItemCell.self, forCellReuseIdentifier: ItemCell.reuseIdentifier)
         tableView.rowHeight = 80
         tableView.separatorStyle = .none
-        tableView.backgroundColor = .systemBackground
+        tableView.backgroundColor = .black
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
@@ -34,12 +40,13 @@ class FavoritesViewController: UIViewController {
         titleLabel.text = "No Favorites Yet"
         titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
         titleLabel.textAlignment = .center
+        titleLabel.textColor = .white
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         let subtitleLabel = UILabel()
         subtitleLabel.text = "Tap the star icon to add items to your favorites."
         subtitleLabel.font = .systemFont(ofSize: 16, weight: .regular)
-        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.textColor = .systemGray3
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -82,13 +89,19 @@ class FavoritesViewController: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
         title = "Favorites"
         
+        view.addSubview(starfieldView)
         view.addSubview(tableView)
         view.addSubview(emptyStateView)
         
         NSLayoutConstraint.activate([
+            starfieldView.topAnchor.constraint(equalTo: view.topAnchor),
+            starfieldView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            starfieldView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            starfieldView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),

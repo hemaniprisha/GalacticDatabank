@@ -14,12 +14,18 @@ class SearchViewController: UIViewController {
         return controller
     }()
     
+    private let starfieldView: StarfieldView = {
+        let view = StarfieldView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(ItemCell.self, forCellReuseIdentifier: ItemCell.reuseIdentifier)
         tableView.rowHeight = 80
         tableView.separatorStyle = .none
-        tableView.backgroundColor = .systemBackground
+        tableView.backgroundColor = .black
         tableView.keyboardDismissMode = .onDrag
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
@@ -40,12 +46,13 @@ class SearchViewController: UIViewController {
         titleLabel.text = "Search the Galaxy"
         titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
         titleLabel.textAlignment = .center
+        titleLabel.textColor = .white
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         let subtitleLabel = UILabel()
         subtitleLabel.text = "Find characters, planets, starships, and more..."
         subtitleLabel.font = .systemFont(ofSize: 16, weight: .regular)
-        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.textColor = .systemGray3
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -84,13 +91,19 @@ class SearchViewController: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
         title = "Search"
         
+        view.addSubview(starfieldView)
         view.addSubview(tableView)
         view.addSubview(emptyStateView)
         
         NSLayoutConstraint.activate([
+            starfieldView.topAnchor.constraint(equalTo: view.topAnchor),
+            starfieldView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            starfieldView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            starfieldView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -114,6 +127,24 @@ class SearchViewController: UIViewController {
         searchController.searchResultsUpdater = self
         searchController.searchBar.delegate = self
         definesPresentationContext = true
+
+        // Make search text visible on dark background
+        let textField = searchController.searchBar.searchTextField
+        textField.textColor = .white
+        textField.keyboardAppearance = .dark
+        textField.backgroundColor = UIColor(white: 0.15, alpha: 1.0)
+        textField.defaultTextAttributes[.foregroundColor] = UIColor.white
+        if #available(iOS 13.0, *) {
+            textField.overrideUserInterfaceStyle = .dark
+        }
+        searchController.searchBar.barStyle = .black
+        searchController.searchBar.tintColor = .systemYellow
+        if let placeholder = textField.placeholder {
+            textField.attributedPlaceholder = NSAttributedString(
+                string: placeholder,
+                attributes: [.foregroundColor: UIColor.systemGray3]
+            )
+        }
     }
     
     // MARK: - Data Management
@@ -283,8 +314,15 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
 extension SearchViewController: UISearchResultsUpdating, UISearchBarDelegate {
     
     func updateSearchResults(for searchController: UISearchController) {
-        // This method is intentionally left empty
-        // We'll handle search in searchBarSearchButtonClicked
+        guard let text = searchController.searchBar.text, !text.trimmingCharacters(in: .whitespaces).isEmpty else {
+            isSearching = false
+            searchResults.removeAll()
+            tableView.reloadData()
+            updateEmptyState()
+            return
+        }
+        isSearching = true
+        searchItems(query: text)
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -305,6 +343,10 @@ extension SearchViewController: UISearchResultsUpdating, UISearchBarDelegate {
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         isSearching = true
+        // Force visible text color when user starts typing
+        let textField = searchBar.searchTextField
+        textField.textColor = .white
+        textField.typingAttributes = [.foregroundColor: UIColor.white]
         tableView.reloadData()
     }
     

@@ -21,9 +21,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Navigation bar appearance
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .systemBackground
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
+        appearance.backgroundColor = .black
+        appearance.titleTextAttributes = [
+            .foregroundColor: UIColor.systemYellow
+        ]
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: UIColor.systemYellow
+        ]
         
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
@@ -33,13 +37,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if #available(iOS 15.0, *) {
             let tabBarAppearance = UITabBarAppearance()
             tabBarAppearance.configureWithOpaqueBackground()
-            tabBarAppearance.backgroundColor = .systemBackground
+            tabBarAppearance.backgroundColor = .black
             
             UITabBar.appearance().standardAppearance = tabBarAppearance
             UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         }
         
         UITabBar.appearance().tintColor = .systemYellow
-        UITabBar.appearance().unselectedItemTintColor = .systemGray
+        UITabBar.appearance().unselectedItemTintColor = .systemGray3
     }
 }
