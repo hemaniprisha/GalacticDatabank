@@ -175,7 +175,7 @@ extension ListViewController: UISearchResultsUpdating {
             return
         }
         
-        filteredItems = items.filter { $0.name.lowercased().contains(searchText) }
+        filteredItems = items.filter { $0.displayName.lowercased().contains(searchText) }
         tableView.reloadData()
     }
 }
@@ -260,8 +260,8 @@ class ItemCell: UITableViewCell {
     }
     
     func configure(with item: StarWarsItem) {
-        titleLabel.text = item.name
-        subtitleLabel.text = item.description
+        titleLabel.text = item.displayName
+        subtitleLabel.text = item.displayDescription
         
         // Set placeholder image based on item type
         let placeholderImage = UIImage(systemName: item.type.iconName)
@@ -280,4 +280,3 @@ class ItemCell: UITableViewCell {
         }
     }
 }
-

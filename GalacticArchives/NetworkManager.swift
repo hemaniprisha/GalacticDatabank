@@ -47,7 +47,11 @@ class NetworkManager {
         
         do {
             let response = try jsonDecoder.decode(StarWarsResponse.self, from: data)
-            return response.results
+            var items = response.results
+            for index in items.indices {
+                items[index].type = type
+            }
+            return items
         } catch {
             throw NetworkError.decodingError
         }
@@ -77,7 +81,11 @@ class NetworkManager {
         
         let (data, _) = try await URLSession.shared.data(from: url)
         let response = try jsonDecoder.decode(StarWarsResponse.self, from: data)
-        return response.results
+        var items = response.results
+        for index in items.indices {
+            items[index].type = .people
+        }
+        return items
     }
     
     func searchItems(

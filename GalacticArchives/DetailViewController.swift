@@ -157,8 +157,8 @@ class DetailViewController: UIViewController {
     }
     
     private func configure(with item: StarWarsItem) {
-        titleLabel.text = item.name
-        descriptionLabel.text = item.description
+        titleLabel.text = item.displayName
+        descriptionLabel.text = item.displayDescription
         
         // Set header image
         if let imageUrl = item.imageUrl, let url = URL(string: imageUrl) {
@@ -179,6 +179,22 @@ class DetailViewController: UIViewController {
         for (key, value) in item.additionalInfo {
             addInfoSection(title: key, content: value)
         }
+
+        loadHomeworldIfNeeded()
+    }
+
+    private func loadHomeworldIfNeeded() {
+        guard let homeworldURLString = item.homeworld,
+              let url = URL(string: homeworldURLString) else { return }
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            guard let data = data else { return }
+            struct Planet: Decodable { let name: String }
+            if let planet = try? JSONDecoder().decode(Planet.self, from: data) {
+                DispatchQueue.main.async {
+                    self?.addInfoSection(title: "Homeworld", content: planet.name)
+                }
+            }
+        }.resume()
     }
     
     private func setPlaceholderImage() {
@@ -251,7 +267,7 @@ class DetailViewController: UIViewController {
     }
     
     @objc private func shareButtonTapped() {
-        let text = "Check out \(item.name) in the Galactic Databank!"
+        let text = "Check out \(item.displayName) in the Galactic Databank!"
         let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
         present(activityVC, animated: true)
     }
